@@ -4,8 +4,6 @@ Windows app for voice cloning and text-to-speech. The model is [IndexTTS-2.5](ht
 
 It runs on your machine. Audio does not get sent anywhere.
 
-This is not an official Bilibili / Index Team product. Do not drop IndexTTS-2 weights into this folder — the files and inference code are different.
-
 ## What it does
 
 Give it a short reference clip and some text. It speaks that text in that voice.
