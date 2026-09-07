@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background circle with glassmorphism effect -->
+  <circle cx="64" cy="64" r="60" fill="#0f172a"/>
+  <circle cx="64" cy="64" r="58" fill="url(#grad1)" opacity="0.15"/>
+  <circle cx="64" cy="64" r="56" stroke="url(#grad1)" stroke-width="2" fill="none" opacity="0.5"/>
+  
+  <!-- Microphone icon -->
+  <g filter="url(#glow)">
+    <!-- Mic body -->
+    <rect x="52" y="28" width="24" height="40" rx="12" fill="url(#grad1)"/>
+    
+    <!-- Mic stand arc -->
+    <path d="M40 68 Q40 88 64 88 Q88 88 88 68" stroke="url(#grad1)" stroke-width="4" fill="none" stroke-linecap="round"/>
+    
+    <!-- Mic stand -->
+    <line x1="64" y1="88" x2="64" y2="100" stroke="url(#grad1)" stroke-width="4" stroke-linecap="round"/>
+    
+    <!-- Base -->
+    <line x1="52" y1="100" x2="76" y2="100" stroke="url(#grad1)" stroke-width="4" stroke-linecap="round"/>
+    
+    <!-- Sound waves -->
+    <path d="M92 48 Q100 64 92 80" stroke="url(#grad1)" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.7"/>
+    <path d="M100 40 Q112 64 100 88" stroke="url(#grad1)" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.4"/>
+  </g>
+</svg>

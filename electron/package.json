@@ -1,0 +1,59 @@
+{
+  "name": "voxai-studio",
+  "version": "2.5.0",
+  "description": "VoxAI Studio 2.5 - IndexTTS-2.5 desktop application",
+  "main": "main.js",
+  "author": "VoxAI Team",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron . --dev",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.voxai.studio",
+    "productName": "VoxAI Studio",
+    "artifactName": "VoxAI-Studio-${version}-${os}-${arch}.${ext}",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../api_server.py",
+        "to": "backend/api_server.py"
+      },
+      {
+        "from": "../indextts",
+        "to": "backend/indextts"
+      },
+      {
+        "from": "../pyproject.toml",
+        "to": "backend/pyproject.toml"
+      },
+      {
+        "from": "../requirements.runtime.txt",
+        "to": "backend/requirements.runtime.txt"
+      }
+    ],
+    "win": {
+      "icon": "src/assets/icons/icon.ico",
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
+  }
+}

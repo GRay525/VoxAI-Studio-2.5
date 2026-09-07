@@ -1,0 +1,87 @@
+/**
+ * VoxAI Studio - Theme Definitions
+ * =====================================
+ * Light and dark theme variables
+ */
+
+/* ============================================
+   Light Theme
+   ============================================ */
+[data-theme="light"] {
+    /* Colors - Light Theme (Neutral Warm) */
+    --color-bg-primary: #fbfbfa;
+    /* Less saturated, closer to white/gray */
+    --color-bg-secondary: #f3f3f2;
+    --color-bg-tertiary: #e5e5e5;
+    --color-surface: rgba(0, 0, 0, 0.02);
+    --color-surface-hover: rgba(0, 0, 0, 0.04);
+    --color-surface-active: rgba(0, 0, 0, 0.06);
+
+    /* Glass Effect - Light */
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-bg-hover: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(0, 0, 0, 0.06);
+    --glass-border-hover: rgba(0, 0, 0, 0.1);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+
+    /* Text Colors - Light (Neutral) */
+    --text-primary: #1a1a1a;
+    --text-secondary: #525252;
+    --text-tertiary: #737373;
+    --text-muted: #a3a3a3;
+
+    /* Border */
+    --border-color: rgba(0, 0, 0, 0.08);
+}
+
+/* Light theme background gradient */
+[data-theme="light"] .app-container::before {
+    background: radial-gradient(circle at 30% 30%, rgba(200, 200, 200, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 70% 70%, rgba(180, 180, 180, 0.05) 0%, transparent 40%);
+}
+
+/* Light theme title bar */
+[data-theme="light"] .title-bar {
+    background: var(--color-bg-secondary);
+}
+
+/* Light theme adjustments */
+[data-theme="light"] .text-input {
+    background: white;
+}
+
+[data-theme="light"] .select-field {
+    background: white;
+}
+
+[data-theme="light"] .input-field {
+    background: white;
+}
+
+[data-theme="light"] .slider {
+    background: var(--color-bg-tertiary);
+}
+
+[data-theme="light"] .upload-zone {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="light"] .upload-zone:hover,
+[data-theme="light"] .upload-zone.dragover {
+    background: rgba(99, 102, 241, 0.08);
+}
+
+/* ============================================
+   Theme Transition
+   ============================================ */
+body,
+.title-bar,
+.sidebar,
+.glass-card,
+.text-input,
+.select-field,
+.input-field {
+    transition: background-color var(--transition-normal),
+        border-color var(--transition-normal),
+        color var(--transition-normal);
+}

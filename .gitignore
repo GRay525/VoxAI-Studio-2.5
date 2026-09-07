@@ -1,0 +1,36 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.mypy_cache/
+.ruff_cache/
+
+# Node / Electron
+electron/node_modules/
+electron/dist/
+electron/.cache/
+
+# Models and generated audio
+checkpoints/*
+!checkpoints/.gitkeep
+output/
+outputs/
+prompts/
+*.wav
+backend_startup.log
+*.log
+
+# Local packaged app (rebuild after clone)
+/VoxAI Studio.exe
+
+# Local copies, not part of this source tree
+_extract/
+vendor/
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+desktop.ini
+.ipynb_checkpoints/

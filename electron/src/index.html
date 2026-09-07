@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' http://127.0.0.1:* http://localhost:*; media-src 'self' http://127.0.0.1:* http://localhost:* blob:;">
+    <title>VoxAI Studio 2.5</title>
+    <link rel="stylesheet" href="styles/index.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/themes.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"
+        media="print" onload="this.media='all'">
+
+    <!-- Fix Settings Layout and Dropdown Styling -->
+    <style>
+        /* Setting group - vertical layout (3 lines) */
+        .setting-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .setting-group .field-label {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .setting-group .setting-desc {
+            font-size: 0.85rem;
+            margin: 0 0 0.5rem 0;
+            line-height: 1.4;
+        }
+
+        .setting-group .select-field,
+        .setting-group .input-field {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        /* Ensure loading screen colors and text are correct */
+        .loading-title {
+            color: #ffffff !important;
+        }
+
+        .loading-status {
+            color: #94a3b8 !important;
+        }
+
+        .loading-hint {
+            max-width: 440px;
+            margin: 0 auto;
+            line-height: 1.5;
+            font-size: 13px;
+            color: #64748b !important;
+        }
+
+        /* Loading overlay fade-out transition */
+        .loading-overlay {
+            transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .loading-overlay.fade-out {
+            opacity: 0;
+            transform: translateY(-10px) scale(0.985);
+            pointer-events: none;
+        }
+
+        .header-tools {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+        }
+
+        .header-icon-btn {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            background: var(--glass-bg);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background var(--transition-fast), color var(--transition-fast),
+                border-color var(--transition-fast);
+        }
+
+        .header-icon-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .header-icon-btn:hover {
+            background: var(--glass-bg-hover);
+            color: var(--text-primary);
+            border-color: var(--glass-border-hover);
+        }
+
+        .language-switch {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            padding: 3px;
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            background: var(--glass-bg);
+        }
+
+        .lang-btn {
+            min-width: 36px;
+            height: 26px;
+            padding: 0 10px;
+            border: none;
+            border-radius: 7px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background var(--transition-fast), color var(--transition-fast);
+        }
+
+        .lang-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .lang-btn.active {
+            background: var(--accent-gradient);
+            color: #fff;
+        }
+
+        .text-section,
+        .output-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .text-section .text-input {
+            flex: 1 1 auto;
+            min-height: 200px;
+        }
+
+        .output-section .waveform-container {
+            flex: 0 0 120px;
+            height: 120px;
+            min-height: 120px;
+            margin-top: 0;
+        }
+
+        .text-section > .emotion-extra,
+        .output-section > .emotion-extra {
+            margin-top: 0;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .text-lang-block .radio-label,
+        .output-speed-block .radio-label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .text-lang-block .radio-desc,
+        .output-speed-block .radio-desc {
+            display: block;
+            margin-bottom: 20px;
+            line-height: 1.55;
+        }
+
+        .text-lang-block .emotion-presets {
+            margin-bottom: 0;
+        }
+
+        .output-section .action-buttons {
+            margin-top: var(--spacing-lg);
+        }
+
+        .speed-slider-row .slider {
+            background: linear-gradient(
+                to right,
+                var(--accent-primary) 0%,
+                var(--accent-primary) var(--speed-pct, 33.333%),
+                var(--color-surface-active) var(--speed-pct, 33.333%),
+                var(--color-surface-active) 100%
+            );
+        }
+
+        .speed-value-wrap {
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 2px;
+            min-width: 56px !important;
+            padding: 0;
+            border: none;
+            background: transparent;
+            cursor: text;
+            -webkit-app-region: no-drag;
+        }
+
+        .speed-value-wrap:focus-within .speed-value-input {
+            color: var(--text-primary);
+        }
+
+        .speed-value-input {
+            width: 3.1em;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            font-variant-numeric: tabular-nums;
+            text-align: right;
+            outline: none;
+            line-height: 1.2;
+            -moz-appearance: textfield;
+        }
+
+        .speed-value-input::-webkit-outer-spin-button,
+        .speed-value-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .speed-value-suffix {
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            line-height: 1;
+        }
+
+        @media (max-width: 960px) {
+            .header-tools {
+                gap: 6px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Custom Title Bar -->
+    <div class="title-bar" id="titleBar">
+        <div class="title-bar-drag">
+            <div class="title-bar-logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
+                <span class="title-text">VoxAI Studio 2.5</span>
+            </div>
+        </div>
+        <div class="title-bar-controls">
+
+            <button class="title-btn" id="btnMinimize" title="Minimize">
+                <svg viewBox="0 0 12 12">
+                    <path d="M2 6h8" stroke="currentColor" stroke-width="1.5" />
+                </svg>
+            </button>
+            <button class="title-btn" id="btnMaximize" title="Maximize">
+                <svg viewBox="0 0 12 12">
+                    <rect x="2" y="2" width="8" height="8" stroke="currentColor" stroke-width="1.5" fill="none" />
+                </svg>
+            </button>
+            <button class="title-btn title-btn-close" id="btnClose" title="Close">
+                <svg viewBox="0 0 12 12">
+                    <path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.5" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading Overlay (shows during model loading) -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-overlay-toolbar">
+            <div class="language-switch">
+                <button type="button" class="lang-btn" data-ui-lang="en">EN</button>
+                <button type="button" class="lang-btn" data-ui-lang="zh">中</button>
+            </div>
+            <button type="button" class="loading-min-btn" id="btnMinimizeLoading" data-i18n="btn.minimize">Minimize</button>
+            <button type="button" class="loading-quit-btn" id="btnQuitLoading" data-i18n="btn.quit">Quit</button>
+        </div>
+        <div class="loading-content">
+            <div class="loading-logo">
+                <svg class="loading-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
+            </div>
+            <div class="loading-spinner"></div>
+            <h2 class="loading-title" data-i18n="loading.title">Initializing VoxAI Studio</h2>
+            <div class="loading-percent" id="loadingPercent">0%</div>
+            <div class="loading-progress">
+                <div class="loading-progress-bar" id="loadingProgressBar"></div>
+            </div>
+            <p class="loading-status" id="loadingStatus" data-i18n="status.connecting">Connecting to server...</p>
+            <p class="loading-hint" data-i18n="loading.hint">Usually about 1 minute after the first launch. First start or missing cache can take 2–5 minutes. Closing to tray keeps the model loaded; a full quit reloads it.</p>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div class="app-container app-pending" id="appContainer">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-nav">
+                <button class="nav-item active" data-panel="synthesis" title="Voice Synthesis">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                        <line x1="12" y1="19" x2="12" y2="23" />
+                        <line x1="8" y1="23" x2="16" y2="23" />
+                    </svg>
+                    <span class="nav-label" data-i18n="nav.synthesize">Synthesize</span>
+                </button>
+                <button class="nav-item" data-panel="library" title="Voice Library">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                    </svg>
+                    <span class="nav-label" data-i18n="nav.library">Library</span>
+                </button>
+                <button class="nav-item" data-panel="history" title="History">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                    <span class="nav-label" data-i18n="nav.history">History</span>
+                </button>
+            </div>
+            <div class="sidebar-bottom">
+                <button class="nav-item" data-panel="settings" title="Settings">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3" />
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                    </svg>
+                    <span class="nav-label" data-i18n="nav.settings">Settings</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Synthesis Panel -->
+            <section class="panel active" id="panelSynthesis">
+                <div class="panel-header">
+                    <h1 class="panel-title" data-i18n="panel.synthesis">Voice Synthesis</h1>
+                    <div class="header-tools">
+                        <button type="button" class="header-icon-btn" id="btnReloadUi" data-i18n-title="btn.refresh" title="Refresh (Ctrl+R)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="23 4 23 10 17 10" />
+                                <polyline points="1 20 1 14 7 14" />
+                                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                            </svg>
+                        </button>
+                        <div class="language-switch">
+                            <button class="lang-btn active" id="btnLangEn" data-ui-lang="en">EN</button>
+                            <button class="lang-btn" id="btnLangZh" data-ui-lang="zh">中</button>
+                        </div>
+                        <div class="status-indicator" id="modelStatus">
+                            <span class="status-dot"></span>
+                            <span class="status-text" data-i18n="status.checking">Checking...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="synthesis-grid">
+                    <!-- Voice Reference Section -->
+                    <div class="glass-card voice-section">
+                        <h3 class="card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                                <line x1="12" y1="19" x2="12" y2="23" />
+                                <line x1="8" y1="23" x2="16" y2="23" />
+                            </svg>
+                            <span data-i18n="card.voice_reference">Voice Reference</span>
+                        </h3>
+                        <div class="upload-zone" id="voiceDropZone">
+                            <div class="upload-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="17 8 12 3 7 8" />
+                                    <line x1="12" y1="3" x2="12" y2="15" />
+                                </svg>
+                            </div>
+                            <p class="upload-text" data-i18n="upload.drop_text">Drop audio file here or click to upload
+                            </p>
+                            <p class="upload-hint" data-i18n="upload.hint">Supports WAV, MP3, FLAC, M4A</p>
+                            <input type="file" id="voiceFileInput" accept="audio/*" hidden>
+                        </div>
+                        <div class="voice-preview hidden" id="voicePreview">
+                            <div class="preview-info">
+                                <span class="preview-name" id="voiceName">voice_01.wav</span>
+                                <button class="btn-icon" id="btnRemoveVoice" title="Remove">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18" />
+                                        <line x1="6" y1="6" x2="18" y2="18" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="audio-player small" id="voiceAudioPlayer">
+                                <button class="play-btn" id="voiceBtnPlay">
+                                    <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor">
+                                        <polygon points="5 3 19 12 5 21 5 3" />
+                                    </svg>
+                                    <svg class="icon-pause hidden" viewBox="0 0 24 24" fill="currentColor">
+                                        <rect x="6" y="4" width="4" height="16" />
+                                        <rect x="14" y="4" width="4" height="16" />
+                                    </svg>
+                                </button>
+                                <span class="time-display" id="voiceCurrentTime">0:00</span>
+                                <div class="progress-bar" id="voiceProgressBar">
+                                    <div class="progress-fill" id="voiceProgressFill"></div>
+                                </div>
+                                <span class="time-display" id="voiceDuration">0:00</span>
+                                <audio id="voiceAudio"></audio>
+                            </div>
+                        </div>
+                        <!-- Voice Library Quick Select -->
+                        <div class="voice-library-quick" id="voiceLibraryQuick">
+                            <label class="field-label" data-i18n="label.select_library">Or select from library:</label>
+                            <select class="select-field" id="voiceSelect">
+                                <option value="" data-i18n="select.default">-- Select a voice --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Emotion Control Section -->
+                    <div class="glass-card emotion-section">
+                        <h3 class="card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                                <line x1="9" y1="9" x2="9.01" y2="9" />
+                                <line x1="15" y1="9" x2="15.01" y2="9" />
+                            </svg>
+                            <span data-i18n="card.emotion_control">Emotion Control</span>
+                        </h3>
+
+                        <div class="emotion-modes">
+                            <label class="radio-card">
+                                <input type="radio" name="emotionMode" value="0" checked>
+                                <span class="radio-label" data-i18n="radio.from_voice">From Voice</span>
+                                <span class="radio-desc" data-i18n="radio.desc.from_voice">From the reference</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="emotionMode" value="1">
+                                <span class="radio-label" data-i18n="radio.ref_audio">Ref Audio</span>
+                                <span class="radio-desc" data-i18n="radio.desc.ref_audio">Separate source</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="emotionMode" value="2">
+                                <span class="radio-label" data-i18n="radio.vector">Vector Control</span>
+                                <span class="radio-desc" data-i18n="radio.desc.vector">Fine-tune</span>
+                            </label>
+                        </div>
+
+                        <!-- Visual Pulse for Mode 0 -->
+                        <div class="emotion-extra" id="emotionFromVoiceSection">
+                            <div class="pulse-container">
+                                <div class="pulse-ring"></div>
+                                <div class="pulse-ring"></div>
+                                <div class="pulse-ring"></div>
+                                <div class="pulse-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                                        <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                                        <line x1="12" y1="19" x2="12" y2="23" />
+                                        <line x1="8" y1="23" x2="16" y2="23" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <p class="pulse-text" data-i18n="desc.from_voice_pulse">Using vocal characteristics from
+                                reference audio</p>
+                        </div>
+                        <div class="emotion-extra hidden" id="emotionAudioSection">
+                            <label class="field-label" data-i18n="label.emotion_ref">Emotion Reference Audio</label>
+                            <div class="upload-zone small" id="emotionDropZone">
+                                <p class="upload-text" data-i18n="upload.emotion_drop">Drop emotion reference audio</p>
+                                <input type="file" id="emotionFileInput" accept="audio/*" hidden>
+                            </div>
+                            <div class="voice-preview hidden" id="emotionPreview">
+                                <div class="preview-info">
+                                    <span class="preview-name" id="emotionName">ref.wav</span>
+                                    <button class="btn-icon" id="btnRemoveEmotion" title="Remove">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="18" y1="6" x2="6" y2="18" />
+                                            <line x1="6" y1="6" x2="18" y2="18" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="audio-player small" id="emotionAudioPlayer">
+                                    <button class="play-btn" id="emotionBtnPlay">
+                                        <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor">
+                                            <polygon points="5 3 19 12 5 21 5 3" />
+                                        </svg>
+                                        <svg class="icon-pause hidden" viewBox="0 0 24 24" fill="currentColor">
+                                            <rect x="6" y="4" width="4" height="16" />
+                                            <rect x="14" y="4" width="4" height="16" />
+                                        </svg>
+                                    </button>
+                                    <span class="time-display" id="emotionCurrentTime">0:00</span>
+                                    <div class="progress-bar" id="emotionProgressBar">
+                                        <div class="progress-fill" id="emotionProgressFill"></div>
+                                    </div>
+                                    <span class="time-display" id="emotionDuration">0:00</span>
+                                    <audio id="emotionAudio"></audio>
+                                </div>
+                            </div>
+                            <!-- Emotion Library Quick Select -->
+                            <div class="voice-library-quick" id="emotionLibraryQuick"
+                                style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                                <label class="field-label" data-i18n="label.select_library">Or select from
+                                    library:</label>
+                                <select class="select-field" id="emotionSelect">
+                                    <option value="" data-i18n="select.default">-- Select a voice --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Emotion Vector Sliders (for mode 2) -->
+                        <div class="emotion-extra hidden" id="emotionVectorSection">
+                            <div class="emotion-presets">
+                                <button class="preset-btn" data-preset="neutral"
+                                    data-i18n="emotion.neutral">Neutral</button>
+                                <button class="preset-btn" data-preset="happy" data-i18n="emotion.happy">Happy</button>
+                                <button class="preset-btn" data-preset="sad" data-i18n="emotion.sad">Sad</button>
+                                <button class="preset-btn" data-preset="angry" data-i18n="emotion.angry">Angry</button>
+                            </div>
+                            <div class="emotion-sliders">
+                                <div class="slider-row">
+                                    <label data-i18n="emotion.happy">Happy</label>
+                                    <input type="range" class="slider emo-slider" data-emo="0" min="0" max="100"
+                                        value="0">
+                                    <span class="slider-value">0</span>
+                                </div>
+                                <div class="slider-row">
+                                    <label data-i18n="emotion.angry">Angry</label>
+                                    <input type="range" class="slider emo-slider" data-emo="1" min="0" max="100"
+                                        value="0">
+                                    <span class="slider-value">0</span>
+                                </div>
+                                <div class="slider-row">
+                                    <label data-i18n="emotion.sad">Sad</label>
+                                    <input type="range" class="slider emo-slider" data-emo="2" min="0" max="100"
+                                        value="0">
+                                    <span class="slider-value">0</span>
+                                </div>
+                                <div class="slider-row">
+                                    <label data-i18n="emotion.fear">Fear</label>
+                                    <input type="range" class="slider emo-slider" data-emo="3" min="0" max="100"
+                                        value="0">
+                                    <span class="slider-value">0</span>
+                                </div>
+                                <div class="slider-row">
+                                    <label data-i18n="emotion.disgust">Disgust</label>
+                                    <input type="range" class="slider emo-slider" data-emo="4" min="0" max="100"
+                                        value="0">
+                                    <span class="slider-value">0</span>
+                                </div>
+                                <div class="slider-row">
+                                    <label data-i18n="emotion.melancholy">Melancholy</label>
+                                    <input type="range" class="slider emo-slider" data-emo="5" min="0" max="100"
+                                        value="0">
+                                    <span class="slider-value">0</span>
+                                </div>
+                                <div class="slider-row">
+                                    <label data-i18n="emotion.surprise">Surprise</label>
+                                    <input type="range" class="slider emo-slider" data-emo="6" min="0" max="100"
+                                        value="0">
+                                    <span class="slider-value">0</span>
+                                </div>
+                                <div class="slider-row">
+                                    <label data-i18n="emotion.calm">Calm</label>
+                                    <input type="range" class="slider emo-slider" data-emo="7" min="0" max="100"
+                                        value="0">
+                                    <span class="slider-value">0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Emotion Weight -->
+                        <div class="emotion-weight hidden" id="emotionWeightSection">
+                            <label class="field-label" data-i18n="label.emotion_weight">Emotion Weight</label>
+                            <div class="slider-row">
+                                <input type="range" class="slider" id="emotionWeight" min="0" max="100" value="65">
+                                <span class="slider-value" id="emotionWeightValue">0.65</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Text Input Section -->
+                    <div class="glass-card text-section">
+                        <h3 class="card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <line x1="16" y1="13" x2="8" y2="13" />
+                                <line x1="16" y1="17" x2="8" y2="17" />
+                            </svg>
+                            <span data-i18n="card.text_input">Text Input</span>
+                        </h3>
+                        <div class="emotion-extra text-lang-block">
+                            <span class="radio-label" data-i18n="label.tts_lang">Text language</span>
+                            <span class="radio-desc" data-i18n="desc.tts_lang">Pronounce the text as this language. Wrong choice does not translate — it just sounds unnatural.</span>
+                            <div class="emotion-presets" id="ttsLangPills">
+                                <button type="button" class="preset-btn active" data-lang="ZH" data-i18n="tts_lang.zh">Chinese</button>
+                                <button type="button" class="preset-btn" data-lang="EN" data-i18n="tts_lang.en">English</button>
+                                <button type="button" class="preset-btn" data-lang="JA" data-i18n="tts_lang.ja">Japanese</button>
+                                <button type="button" class="preset-btn" data-lang="ES" data-i18n="tts_lang.es">Spanish</button>
+                                <button type="button" class="preset-btn" data-lang="AR" data-i18n="tts_lang.ar">Arabic</button>
+                            </div>
+                        </div>
+                        <textarea class="text-input" id="textInput" data-i18n-placeholder="input.placeholder"
+                            placeholder="Enter your text here...&#10;&#10;Tips:&#10;• Use natural punctuation for better prosody&#10;• Long texts will be automatically segmented"></textarea>
+                        <div class="text-info">
+                            <span id="charCount">0 characters</span>
+                            <span id="tokenCount">~0 tokens</span>
+                        </div>
+                    </div>
+
+                    <!-- Output Section -->
+                    <div class="glass-card output-section">
+                        <h3 class="card-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+                            </svg>
+                            <span data-i18n="card.output">Output</span>
+                        </h3>
+
+                        <div class="emotion-extra output-speed-block">
+                            <span class="radio-label" data-i18n="label.duration_factor">Output speed</span>
+                            <span class="radio-desc" data-i18n="desc.duration_factor">Below 1.0 is faster, above 1.0 is slower (0.5x–2.0x).</span>
+                            <div class="slider-row speed-slider-row">
+                                <label data-i18n="speed.faster">Faster</label>
+                                <input type="range" class="slider" id="durationFactor" min="50" max="200" value="100">
+                                <label class="speed-value-wrap" data-i18n-title="title.duration_factor_input" title="Type 0.50–2.00">
+                                    <input type="number" class="speed-value-input" id="durationFactorValue" min="0.5" max="2" step="0.01" value="1.00" inputmode="decimal">
+                                    <span class="speed-value-suffix">x</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Waveform Visualization -->
+                        <div class="waveform-container" id="waveformContainer">
+
+                            <canvas id="waveformCanvas"></canvas>
+                            <div class="waveform-placeholder" id="waveformPlaceholder">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M2 12h2l2-4 2 8 2-6 2 4 2-2 2 6 2-10 2 8h2" />
+                                </svg>
+                                <p data-i18n="placeholder.generated">Generated audio will appear here</p>
+                            </div>
+                        </div>
+
+                        <!-- Audio Player -->
+                        <div class="audio-player hidden" id="audioPlayer">
+                            <button class="play-btn" id="btnPlay">
+                                <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor">
+                                    <polygon points="5 3 19 12 5 21 5 3" />
+                                </svg>
+                                <svg class="icon-pause hidden" viewBox="0 0 24 24" fill="currentColor">
+                                    <rect x="6" y="4" width="4" height="16" />
+                                    <rect x="14" y="4" width="4" height="16" />
+                                </svg>
+                            </button>
+                            <span class="time-display" id="currentTime">0:00</span>
+                            <div class="progress-bar" id="progressBar">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                            <span class="time-display" id="duration">0:00</span>
+                            <audio id="outputAudio"></audio>
+                        </div>
+                        <p class="gen-elapsed hidden" id="genElapsed"></p>
+
+                        <!-- Progress Indicator (during generation) -->
+                        <div class="generation-progress hidden" id="generationProgress">
+                            <div class="gen-progress-percent" id="genProgressPercent">0.0%</div>
+                            <div class="gen-progress-track">
+                                <div class="gen-progress-bar" id="genProgressBar"></div>
+                            </div>
+                            <p class="progress-text" id="progressText">Starting synthesis...</p>
+                            <p class="gen-elapsed" id="genElapsedLive"></p>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="action-buttons">
+                            <button class="btn btn-primary btn-large" id="btnGenerate">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                                    <line x1="12" y1="19" x2="12" y2="23" />
+                                    <line x1="8" y1="23" x2="16" y2="23" />
+                                </svg>
+                                <span data-i18n="btn.generate">Generate Speech</span>
+                            </button>
+                            <button class="btn btn-secondary" id="btnExport" disabled>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="7 10 12 15 17 10" />
+                                    <line x1="12" y1="15" x2="12" y2="3" />
+                                </svg>
+                                <span data-i18n="btn.export">Export</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Library Panel -->
+            <section class="panel" id="panelLibrary">
+                <div class="panel-header">
+                    <h1 class="panel-title" data-i18n="panel.library">Voice Library</h1>
+
+                </div>
+                <div class="voice-grid" id="voiceGrid">
+                    <!-- Voice cards will be dynamically inserted -->
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                        </svg>
+                        <p data-i18n="empty.library">No voices in library</p>
+                        <p class="hint" data-i18n="empty.library.hint">Upload voice reference files to get started</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History Panel -->
+            <section class="panel" id="panelHistory">
+                <div class="panel-header">
+                    <h1 class="panel-title" data-i18n="panel.history">Generation History</h1>
+                    <button class="btn btn-secondary" id="btnClearHistory">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                        </svg>
+                        <span data-i18n="btn.clear_all">Clear All</span>
+                    </button>
+                </div>
+                <div class="history-list" id="historyList">
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                        <p data-i18n="empty.history">No generation history</p>
+                        <p class="hint" data-i18n="empty.history.hint">Generated audio will appear here</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Panel -->
+            <section class="panel" id="panelSettings">
+                <div class="panel-header">
+                    <h1 class="panel-title" data-i18n="panel.settings">Settings</h1>
+                </div>
+                <div class="settings-content">
+                    <div class="glass-card">
+                        <h3 class="card-title" data-i18n="card.appearance">Appearance</h3>
+                        <div class="setting-group">
+                            <label class="field-label" data-i18n="label.theme">Theme</label>
+                            <p class="setting-desc" data-i18n="desc.theme">Choose your preferred color scheme</p>
+                            <select class="select-field" id="themeSelect">
+                                <option value="dark" data-i18n="theme.dark">Dark</option>
+                                <option value="light" data-i18n="theme.light">Light</option>
+                                <option value="system" data-i18n="theme.system">System</option>
+                            </select>
+                        </div>
+                        <div class="setting-group">
+                            <label class="field-label" data-i18n="label.waveform">Show Waveform</label>
+                            <p class="setting-desc" data-i18n="desc.waveform">Waveform display is currently disabled.</p>
+                            <label class="switch">
+                                <input type="checkbox" id="showWaveformToggle" disabled>
+                                <span class="slider-round"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="glass-card">
+                        <h3 class="card-title" data-i18n="card.generation">Generation</h3>
+                        <div class="setting-group">
+                            <label class="field-label" data-i18n="label.max_tokens">Max Tokens Per Segment</label>
+                            <p class="setting-desc" data-i18n="desc.max_tokens">Higher values = longer sentences, lower
+                                quality control</p>
+                            <input type="number" class="input-field small" id="maxTokens" value="120" min="20"
+                                max="300">
+                        </div>
+                        <div class="setting-group">
+                            <label class="field-label" data-i18n="label.temperature">Temperature</label>
+                            <p class="setting-desc" data-i18n="desc.temperature">Controls randomness. Higher = more
+                                varied</p>
+                            <input type="number" class="input-field small" id="temperature" value="0.8" min="0.1"
+                                max="2.0" step="0.1">
+                        </div>
+                    </div>
+
+                    <div class="glass-card settings-wide">
+                        <h3 class="card-title" data-i18n="card.model_api">Model & API</h3>
+                        <div class="settings-grid-inner">
+                            <div class="setting-group">
+                                <label class="field-label" data-i18n="label.model_status">Model Status</label>
+                                <p class="setting-desc" id="modelStatusDesc">Checking...</p>
+                                <span class="status-badge" id="modelStatusBadge">Unknown</span>
+                            </div>
+                            <div class="setting-group">
+                                <label class="field-label" data-i18n="label.runtime_mode">Runtime Mode</label>
+                                <p class="setting-desc" data-i18n="desc.runtime_mode">Current device used for synthesis
+                                </p>
+                                <div class="runtime-mode-display" id="runtimeMode">--</div>
+                            </div>
+                            <div class="setting-group">
+                                <label class="field-label" data-i18n="label.vram_usage">VRAM Usage</label>
+                                <p class="setting-desc" data-i18n="desc.vram_usage">This app / whole GPU / capacity</p>
+                                <div class="vram-display">
+                                    <span id="vramApp">--</span>
+                                    <span class="vram-sep">/</span>
+                                    <span id="vramDevice">--</span>
+                                    <span class="vram-sep">/</span>
+                                    <span id="vramTotal">--</span>
+                                    <span class="vram-unit">GB</span>
+                                </div>
+                            </div>
+                            <div class="setting-group">
+                                <label class="field-label" data-i18n="label.precision">Precision Mode</label>
+                                <p class="setting-desc" data-i18n="desc.precision">BF16: Low VRAM (≤8GB) | FP32: High VRAM (>8GB)</p>
+                                <select class="select-field" id="precisionModeSelect">
+                                    <option value="fp16">BF16 (Low VRAM)</option>
+                                    <option value="fp32">FP32 (High Quality)</option>
+                                </select>
+                            </div>
+                            <div class="setting-group">
+                                <label class="field-label" data-i18n="btn.unload">Release VRAM</label>
+                                <p class="setting-desc" data-i18n="desc.unload">Unload model to free GPU memory</p>
+                                <button class="btn btn-danger" id="btnUnloadModel" disabled>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10" />
+                                        <line x1="8" y1="12" x2="16" y2="12" />
+                                    </svg>
+                                    <span data-i18n="btn.unload">Unload Model</span>
+                                </button>
+                            </div>
+                            <div class="setting-group">
+                                <label class="field-label" data-i18n="btn.load">Load Model</label>
+                                <p class="setting-desc" data-i18n="desc.load">Reload the TTS model</p>
+                                <button class="btn btn-primary" id="btnLoadModel" disabled>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="1 4 1 10 7 10" />
+                                        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                                    </svg>
+                                    <span data-i18n="btn.load">Load Model</span>
+                                </button>
+                            </div>
+                            <div class="setting-group">
+                                <label class="field-label" data-i18n="label.server_url">Server URL</label>
+                                <p class="setting-desc" data-i18n="desc.server_url">Backend API endpoint</p>
+                                <input type="text" class="input-field" id="apiUrl" value="http://127.0.0.1:8000"
+                                    readonly>
+                            </div>
+                            <div class="setting-group">
+                                <label class="field-label" data-i18n="label.connection">Connection Status</label>
+                                <span class="status-badge" id="apiStatus">Checking...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card">
+                        <h3 class="card-title" data-i18n="card.about">About</h3>
+                        <div class="about-info">
+                            <p><strong>VoxAI Studio</strong> v2.5.0</p>
+                            <p data-i18n="desc.about">Professional AI Voice Synthesis Desktop Application</p>
+                            <p>Powered by IndexTTS-2.5 - Multilingual Emotionally Expressive Zero-Shot TTS</p>
+                            <p class="copyright">© 2026 VoxAI Team</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- First-run Runtime / Model Wizard -->
+    <div class="runtime-modal hidden" id="runtimeModal">
+        <div class="runtime-modal-card">
+            <h3 class="runtime-modal-title" data-i18n="wizard.title">Setup Required</h3>
+            <p class="runtime-modal-desc" id="runtimeWizardMessage" data-i18n="wizard.desc">
+                Backend runtime or model files are not ready.
+            </p>
+            <div class="runtime-modal-actions">
+                <button class="btn btn-primary" id="btnWizardPickModel" data-i18n="wizard.pick_model">Choose Model Folder</button>
+                <button class="btn btn-secondary" id="btnWizardRepairRuntime" data-i18n="wizard.repair_runtime">Repair Runtime</button>
+                <button class="btn btn-secondary" id="btnWizardSelfHeal" data-i18n="wizard.self_heal">Retry Backend</button>
+                <button class="btn btn-secondary" id="btnWizardDownloadModel" data-i18n="wizard.download_model">Download Model Guide</button>
+                <button class="btn btn-secondary" id="btnWizardDiagnostics" data-i18n="wizard.export_diag">Export Diagnostics</button>
+                <button class="btn btn-secondary" id="btnWizardClose" data-i18n="wizard.close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Scripts -->
+    <script src="js/translations.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>

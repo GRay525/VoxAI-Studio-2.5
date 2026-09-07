@@ -1,0 +1,37 @@
+# Runtime dependencies for VoxAI Studio 2.5 (IndexTTS-2.5 + FastAPI).
+# Prefer `uv sync` from the repo root. This file is a fallback for the
+# portable runtime builder.
+
+accelerate==1.8.1
+cn2an==0.5.22
+cython==3.0.7
+descript-audiotools==0.7.2
+einops>=0.8.1
+fastapi>=0.116.0
+ffmpeg-python==0.2.0
+fugashi>=1.2.0
+unidic-lite>=1.0.0
+g2p-en==2.1.0
+jieba==0.42.1
+json5==0.10.0
+librosa==0.10.2.post1
+modelscope==1.27.0
+munch==4.0.0
+numba==0.63.0
+numpy==2.2.6
+omegaconf>=2.3.0
+openai-whisper>=20231117
+pydantic>=2.0
+python-multipart>=0.0.20
+safetensors==0.5.2
+sentencepiece>=0.2.1
+soundfile>=0.13.0
+textstat>=0.7.10
+tokenizers==0.21.0
+torch==2.8.*
+torchaudio==2.8.*
+tqdm>=4.67.1
+transformers==4.52.1
+uvicorn>=0.35.0
+wetext>=0.0.9; sys_platform != "linux"
+WeTextProcessing; sys_platform == "linux"
