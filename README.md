@@ -1,51 +1,49 @@
 # VoxAI Studio 2.5
 
-Windows 桌面端语音合成应用。界面沿用 VoxAI Studio，引擎为官方 [IndexTTS-2.5](https://github.com/index-tts/index-tts)。
+Windows app for voice cloning and text-to-speech. The model is [IndexTTS-2.5](https://github.com/index-tts/index-tts) from Bilibili; this repo is the desktop wrapper around it (Electron, a local Python server, some launch scripts).
 
-> **使用即表示你同意 [免责声明](DISCLAIMER.md) 以及 IndexTTS 的 [模型许可](LICENSE_ZH.txt)（[English](LICENSE)）。**  
-> 本仓库不是 bilibili / Index Team 的官方产品。禁止用于未经授权的仿声、欺诈、深度伪造或任何违法用途。
+It runs on your machine. Audio does not get sent anywhere.
 
-## 功能
+This is not an official Bilibili / Index Team product. Do not drop IndexTTS-2 weights into this folder — the files and inference code are different.
 
-- 参考音频克隆音色
-- 情感：从参考音频 / 独立情感音频 / 向量控制
-- 合成语言：`ZH` / `EN` / `JA` / `ES` / `AR`（选错不会翻译，只影响读音）
-- 语速：`0.5x`–`2.0x`
-- 历史记录、语音库、托盘常驻（关窗口缩托盘不会卸载模型）
+## What it does
 
-半精度在 2.5 对应 **BF16**，不是 FP16。
+Give it a short reference clip and some text. It speaks that text in that voice.
 
-## 仓库里没有什么
+Pick a synthesis language: Chinese, English, Japanese, Spanish, or Arabic. That setting is not a translator. If you pick the wrong one, it just sounds wrong.
 
-下列内容体积大或属于用户数据，**不会**进 Git：
+Emotion usually comes from the same clip. You can also feed a second clip just for emotion, or push a few sliders. Output speed is adjustable (`0.5x`–`2.0x`). Half-precision on 2.5 is **BF16**, not FP16.
 
-| 路径 | 说明 |
-|------|------|
-| `checkpoints/` | IndexTTS-2.5 权重，需自行下载 |
-| `outputs/` | 生成的音频 |
-| `prompts/` | 你导入的参考音色 |
+Closing the window hides it in the tray instead of quitting. The model stays loaded. A full quit unloads it.
 
-不要把 IndexTTS 2.0 的权重拷进本目录，文件布局和推理代码都不兼容。
+## What you need
 
-## 环境要求
-
-- Windows 10 / 11
-- NVIDIA GPU，建议 6 GB 以上显存
-- Python 3.10 或 3.11
+- Windows 10 or 11, 64-bit
+- Python 3.10 or 3.11
 - Node.js LTS
-- 带 CUDA 的 PyTorch（脚本会按 CUDA 12.8 安装）
+- An NVIDIA GPU unless you like waiting. About 6 GB of VRAM is the lowest I would call usable.
 
-## 第一次运行
+Weights live in `checkpoints/` and they are several GB. The first launch takes a while. Later launches are usually around a minute if the cache is already there.
 
-在仓库根目录：
+This repo does **not** include:
+
+- `checkpoints/` — download the model yourself
+- `outputs/` — generated audio
+- `prompts/` — your reference voices
+
+## Run it
+
+From a clone:
 
 ```bat
+git clone https://github.com/GRay525/VoxAI-Studio-2.5.git
+cd VoxAI-Studio-2.5
 scripts\setup.cmd
 scripts\download_models.cmd
 start.cmd
 ```
 
-或 PowerShell：
+Or PowerShell:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts\setup.ps1
@@ -54,21 +52,34 @@ cd electron
 npm.cmd start
 ```
 
-- 日常启动：`start.cmd`（会打开 CMD 窗口，便于看后端日志）
-- 权重默认从 ModelScope 下载；改用 Hugging Face：`scripts\download_models.ps1 -Source huggingface`
-- 首次推理还会把 w2v-bert、CAMPPlus、BigVGAN 缓存到 `checkpoints/hf_cache/`。若 Hugging Face 较慢，可先设置 `$env:HF_ENDPOINT = "https://hf-mirror.com"`
-- 模型加载通常约 1 分钟；首次或缓存未齐可能 2–5 分钟。完整退出后再开会重新加载；缩到托盘不会
+`download_models.cmd` pulls IndexTTS-2.5 weights (ModelScope by default). Hugging Face:
 
-## 工程结构
+```powershell
+powershell -File scripts\download_models.ps1 -Source huggingface
+```
 
-- `electron/`：桌面 UI、主进程、预加载脚本
-- `api_server.py`：本地 FastAPI，调用 `indextts.infer_v2_5`
-- `indextts/`：IndexTTS-2.5 推理代码
-- `scripts/`：依赖安装与模型下载
-- `DISCLAIMER.md`：使用限制与责任说明
+The first synthesis may still fetch w2v-bert, CAMPPlus, and BigVGAN into `checkpoints/hf_cache/`. If Hugging Face is slow:
 
-## 许可证
+```powershell
+$env:HF_ENDPOINT = "https://hf-mirror.com"
+```
 
-- 本仓库中的 IndexTTS 模型与官方推理相关文件，遵循 **bilibili 模型使用许可协议**：见 [LICENSE](LICENSE)、[LICENSE_ZH.txt](LICENSE_ZH.txt)。
-- 使用前请阅读 [DISCLAIMER.md](DISCLAIMER.md)。
-- 月活超过 1 亿或年营收超过人民币 1 亿元的主体，须按官方协议另行申请许可。
+Day to day, use `start.cmd`. It opens a CMD window on purpose so you can see backend logs.
+
+## Voices
+
+Only clone a voice you have permission to use. If you publish the audio, say that it was generated. The longer version is in [DISCLAIMER.md](DISCLAIMER.md).
+
+Output quality follows the reference clip more than anything else. A few seconds of clean speech beats a long noisy recording. Listen to the result before you use it for anything that matters.
+
+## How it is wired
+
+```
+Electron  →  FastAPI on 127.0.0.1:8000  →  IndexTTS-2.5
+```
+
+On quit it hits `/api/shutdown` so GPU memory actually gets released.
+
+## Credit
+
+The model and inference code belong to the [index-tts](https://github.com/index-tts/index-tts) team. Their license covers that part. This repo is the wrapper on top. See [LICENSE](LICENSE) and [LICENSE_ZH.txt](LICENSE_ZH.txt).

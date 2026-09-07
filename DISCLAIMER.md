@@ -1,70 +1,198 @@
-# 免责声明
+# DISCLAIMER AND TERMS OF USE
 
-**使用本项目前，请完整阅读本声明、[LICENSE](LICENSE) 与 [LICENSE_ZH.txt](LICENSE_ZH.txt)。继续下载、安装、运行或分发，即视为你已阅读、理解并同意全部内容。**
+**VoxAI Studio v2.5**
 
-本仓库 **VoxAI Studio 2.5** 是一套桌面端封装（Electron + FastAPI），语音合成引擎来自 [IndexTTS-2.5](https://github.com/index-tts/index-tts)（bilibili Index Team）。本仓库不是 bilibili / Index Team 的官方产品，也不代表其对封装层作任何背书或担保。
+VoxAI Studio is a desktop application for AI-powered voice synthesis based on the IndexTTS-2.5 project. By downloading, installing, or using this software, you agree to be bound by the terms set forth below. If you do not agree, do not use this software.
 
-模型权重、推理代码及其衍生品的使用，须同时遵守 **bilibili 模型使用许可协议**（见仓库内 `LICENSE`、`LICENSE_ZH.txt`）。若中英文许可文本冲突，以中文版为准。
-
----
-
-## 1. 使用限制
-
-本项目仅供技术研究、学习以及合法的个人创意使用，不得用于任何违反法律法规的活动。
-
-你不得使用本项目或其生成结果：
-
-1. 合成政治人物、公众人物或任何未经授权的个人声音；
-2. 创建诋毁、侮辱、歧视或损害他人名誉和权益的内容；
-3. 进行欺诈、身份盗用或任何形式的违法活动；
-4. 传播虚假信息或制造社会恐慌；
-5. 侵犯他人知识产权、肖像权、声音权益或隐私权；
-6. 未经合法授权将合成声音用于商业目的；
-7. 违反金融、医疗等特定行业的监管要求；
-8. 创建或使用涉及未成年人的不当声音内容；
-9. 制作可能威胁国家安全的内容；
-10. 违反任何地区关于深度伪造、人工智能生成合成内容的法律法规。
-
-禁止将本项目及其模型直接部署于医疗诊断、自动驾驶、军事、关键基础设施控制、大规模生物识别监控、自动化决策（如信贷、就业评估）等高风险场景。若你坚持部署，须自行完成全部合规义务，相关后果由你自行承担。
-
-月活跃用户超过 1 亿，或上一自然年营收超过人民币 1 亿元的主体，使用 IndexTTS 模型须另行向 bilibili 申请许可，详见官方许可协议。
+This document does not constitute legal advice. Consult a qualified attorney in your jurisdiction for specific legal questions.
 
 ---
 
-## 2. 内容与责任
+## 1. Definitions
 
-1. 你使用本项目过程中上传的参考音频、输入文本、生成音频及一切衍生内容，其合法性与法律责任由你自行承担。
-2. 本项目按「现状」提供，不保证满足特定需求，不保证不中断、无错误或适合任何用途。
-3. 仓库维护者、IndexTTS 原作者及关联方，不对使用本项目产生的任何直接或间接后果承担责任，包括但不限于法律纠纷、数据丢失、利润损失、行政处罚或第三方索赔。
-4. 生成音频可能被滥用。你应自行采取合理措施，避免未经授权的仿声、欺诈或误导性传播，并遵守所在地关于 AI 生成内容标识的要求。
+For the purposes of this document:
 
----
-
-## 3. 数据与仓库内容
-
-1. 本仓库**不包含**模型权重（`checkpoints/`）、生成结果（`outputs/`）或参考音色（`prompts/`）。这些文件由你在本地下载或生成，请自行保管，不要公开发布他人声音样本。
-2. 参考音频可能包含个人生物特征信息。请仅使用你拥有合法权利的录音。
+- **"Software"** refers to VoxAI Studio and all associated components, models, and documentation.
+- **"Voice Data"** refers to any audio recording used as a reference for voice cloning or synthesis.
+- **"Generated Content"** refers to any audio output produced by the Software.
+- **"Consent"** refers to explicit, informed, written permission from the voice owner that specifies the scope, duration, and purpose of use, and that may be revoked at any time.
+- **"Commercial Use"** refers to any use intended to generate revenue, promote products or services, or gain commercial advantage.
+- **"Voice Owner"** refers to the natural person whose voice is used as reference Voice Data.
+- **"You" / "User"** refers to any individual or entity that downloads, installs, or uses the Software.
 
 ---
 
-## 4. 知识产权
+## 2. Scope and Purpose
 
-1. IndexTTS 模型与官方推理代码的权利归其原始权利人。本封装层不授予其商标、商号或产品名称的使用权，除非为合理说明来源所必需。
-2. 你对本封装层的修改与分发，不得删除本声明、官方许可协议及原始版权信息。
-3. 若你分发基于 IndexTTS 的衍生品，须按官方许可在发布页声明：对原模型的改动与原始权利人无关，原始权利人不背书、不担保、不承担责任。
+This Software is provided for educational, research, and creative purposes. All use must comply with applicable laws, ethical standards, and the terms of this document.
 
----
-
-## 5. 法律适用
-
-1. 你应确保使用行为符合所在地区的法律法规。
-2. IndexTTS 模型许可协议受中华人民共和国法律管辖，争议解决方式见 `LICENSE` / `LICENSE_ZH.txt`。
-3. 如本声明任何条款与强制适用法律冲突，以法律为准，其余条款仍然有效。
+**Age Requirement:** You must be at least 18 years of age to use this Software, or have verifiable parental or legal guardian consent. Where local law sets a higher age of majority, that higher age applies.
 
 ---
 
-## 6. 更新
+## 3. Permitted Uses
 
-本声明可能随时更新，更新后自发布之日起适用于此后的下载与使用。请在使用前再次阅读。
+You may use this Software for:
 
-最后更新日期：2026-09-08
+- Personal content creation, entertainment, and artistic expression
+- Academic research, technology evaluation, and educational demonstrations
+- Professional and commercial projects, provided you have obtained Consent from all Voice Owners and hold all required licenses
+
+All uses must comply with Section 5 (Voice Consent Requirements) and Section 6 (Disclosure and Attribution).
+
+---
+
+## 4. Prohibited Uses
+
+You must not use this Software for:
+
+**4.1 Fraud and Impersonation.** Impersonating individuals without Consent; identity theft; scams, phishing, or social engineering; creating false statements attributed to real persons; unauthorized use of any person's voice.
+
+**4.2 Misinformation.** Creating misleading or false audio content; manipulating political discourse or public opinion; generating fake news, propaganda, or false emergency alerts; fabricating or tampering with evidence.
+
+**4.3 Harassment and Harm.** Harassment, bullying, stalking, intimidation, or threats; defamation or content intended to damage reputation; content targeting protected characteristics (race, religion, gender, disability, sexual orientation, etc.); non-consensual sexual or intimate content.
+
+**4.4 Illegal Activities.** Any activity prohibited by applicable law; copyright, trademark, or intellectual property infringement; violation of privacy or data protection regulations (including GDPR, CCPA, and equivalents); facilitation of criminal conduct including fraud, blackmail, or extortion.
+
+**4.5 Unauthorized Commercial Use.** Commercial Use without Voice Owner Consent; monetizing Generated Content without proper licensing; selling or redistributing Generated Content as authentic recordings.
+
+**4.6 Safety-Critical Applications.** Emergency communications; medical advice or prescriptions; legal testimony presented as authentic (without disclosure); financial transaction authorization; any safety-critical system where audio misidentification could cause harm.
+
+---
+
+## 5. Voice Consent Requirements
+
+Before cloning or using any person's voice, you must:
+
+(a) Obtain Consent from the Voice Owner that specifies how the voice will be used, the scope and duration of permitted use, and any compensation terms.
+
+(b) Document and retain all Consent records. Update Consent for any new or expanded use cases.
+
+(c) Immediately cease use upon revocation of Consent.
+
+**Special cases:**
+
+- Deceased persons: Obtain consent from the estate or authorized family representative.
+- Public figures: Fame does not constitute Consent. Direct written permission is required.
+- Minors: Obtain verifiable parental or legal guardian consent.
+
+**Exception:** You may use your own voice without additional Consent documentation.
+
+---
+
+## 6. Disclosure and Attribution
+
+All Generated Content must include clear disclosure that it was produced using AI voice synthesis. Acceptable forms include:
+
+- "This audio was generated using AI voice synthesis technology."
+- "AI-generated voice. Original voice: [Name] (used with permission)."
+
+You must never present Generated Content as an authentic recording of a real person. Synthetic content should be clearly marked in metadata where technically feasible.
+
+When distributing this Software or derivative works, you must credit the IndexTTS project (https://github.com/index-tts/index-tts) and preserve all copyright notices and license files.
+
+---
+
+## 7. Privacy and Data
+
+VoxAI Studio processes all Voice Data and text locally on your device. The Software does not transmit Voice Data, Generated Content, or usage telemetry to external servers.
+
+You are solely responsible for the security, storage, and lawful handling of any Voice Data and Generated Content on your system, including compliance with applicable data protection regulations.
+
+---
+
+## 8. Generated Content Ownership
+
+You retain usage rights to Generated Content you create, subject to the terms of this document and any Consent agreements with Voice Owners.
+
+Generating audio does not transfer ownership of, or rights to, any Voice Owner's voice. Voice Owners retain all personality rights, publicity rights, and moral rights to their voice regardless of how Generated Content is used.
+
+The underlying models, algorithms, and Software remain the intellectual property of their respective rights holders.
+
+---
+
+## 9. Technical Limitations
+
+This Software may produce: incorrect pronunciation; unnatural rhythm, cadence, or emotional expression; audio artifacts including glitches, noise, or distortion; output that does not accurately reflect the intended meaning or the Voice Owner's natural delivery.
+
+Results vary depending on hardware (GPU/CPU), input quality, and text complexity. Always review and verify Generated Content before distribution, publication, or any consequential use.
+
+---
+
+## 10. Disclaimer of Warranties
+
+THIS SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS, IMPLIED, OR STATUTORY. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE DEVELOPERS DISCLAIM ALL WARRANTIES, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, ACCURACY, AND UNINTERRUPTED AVAILABILITY.
+
+---
+
+## 11. Limitation of Liability
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL THE DEVELOPERS, CONTRIBUTORS, OR DISTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES ARISING OUT OF OR RELATED TO YOUR USE OF THE SOFTWARE, INCLUDING BUT NOT LIMITED TO: loss of data; system failures; financial losses; reputational harm; third-party claims (including intellectual property, privacy, or defamation claims); or any damages resulting from Generated Content.
+
+Nothing in this section excludes or limits liability that cannot be excluded or limited under applicable law, including liability for fraud or willful misconduct.
+
+---
+
+## 12. User Responsibility and Indemnification
+
+You are solely responsible for:
+
+- All Generated Content you create and distribute
+- Obtaining all necessary Consent, licenses, and permissions
+- Compliance with all applicable laws, regulations, and platform terms of service
+- Reviewing Generated Content for accuracy and appropriateness before any use
+- Any legal consequences, damages, or third-party claims arising from your use
+
+To the extent permitted by applicable law, you agree to indemnify and hold harmless the developers, contributors, and distributors from any claims, damages, or expenses (including reasonable legal fees) arising from your use of the Software or your violation of these terms.
+
+---
+
+## 13. Copyright and Third-Party Components
+
+This project is based on IndexTTS-2.5 by the index-tts team (https://github.com/index-tts/index-tts). All rights to the underlying IndexTTS technology belong to its original developers. The IndexTTS model is also subject to the [bilibili Model Use License Agreement](LICENSE).
+
+VoxAI Studio incorporates open-source components including: Electron (MIT License), PyTorch (BSD-3-Clause), Transformers (Apache 2.0), FastAPI (MIT License), and others. Each component retains its original license. See the respective LICENSE files in the source tree and dependency directories.
+
+Pre-trained models may carry separate license terms. Verify individual model licenses before Commercial Use.
+
+---
+
+## 14. Reporting Misuse
+
+If you become aware of misuse of this Software, report it via:
+
+- GitHub Issues: https://github.com/GRay525/VoxAI-Studio-2.5/issues (tag: "abuse-report")
+
+Include a description of the misuse, supporting evidence, and URLs or locations of problematic content. We will review credible reports and cooperate with law enforcement where appropriate. We cannot monitor all uses of the Software, guarantee resolution of all reports, or remove content from third-party platforms.
+
+---
+
+## 15. Amendments
+
+We may update this document to reflect legal developments, address new forms of misuse, or improve clarity. Material changes will be communicated via release notes and repository announcements with at least 30 days' notice before taking effect. Continued use of the Software after the effective date of an amendment constitutes acceptance of the revised terms.
+
+---
+
+## 16. Severability and Governing Law
+
+If any provision of this document is found to be invalid or unenforceable under applicable law, that provision shall be modified to the minimum extent necessary to make it enforceable, or severed if modification is not possible. All remaining provisions continue in full force and effect.
+
+This document and your use of the Software are governed by the laws of your jurisdiction. You are responsible for determining and complying with all laws applicable to your use, including but not limited to: voice and personality rights, copyright and intellectual property, data protection and privacy (GDPR, CCPA, etc.), AI-specific regulations (including the EU AI Act where applicable), and consumer protection laws.
+
+Disputes shall be resolved first through good-faith negotiation, then through mediation or the courts of competent jurisdiction in your locality.
+
+---
+
+## 17. Acknowledgment
+
+By using VoxAI Studio, you confirm that you have read, understood, and agree to all terms in this document. You accept sole responsibility for your use of the Software and any Generated Content you produce. You acknowledge that violation of these terms may result in legal action by affected parties, civil or criminal liability, and financial damages.
+
+---
+
+**Version:** 2.5
+**Effective Date:** September 8, 2026
+**Previous Version:** 2.0 (March 20, 2026)
+
+(c) 2026 VoxAI Studio Contributors. All rights reserved.
+
+This document does not constitute legal advice. For specific legal questions, consult a qualified attorney in your jurisdiction.
